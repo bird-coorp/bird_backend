@@ -1,7 +1,8 @@
 package br.com.bird.servicebirdad.application.port.input
 
-import org.bouncycastle.util.test.FixedSecureRandom.BigInteger
+import br.com.bird.servicebirdad.domain.Campaign
+import br.com.bird.servicebirdad.infrastructure.adapter.entity.CampaignEntity
 
 interface CampaignUseCase {
-    fun createCampaign(companyId: BigInteger)
+    fun createCampaign(companyId: Long, campaign: Campaign): CampaignEntity
 }

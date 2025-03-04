@@ -1,12 +1,40 @@
 package br.com.bird.servicebirdad.application.service
 
 import br.com.bird.servicebirdad.application.port.input.CampaignUseCase
-import org.bouncycastle.util.test.FixedSecureRandom
+import br.com.bird.servicebirdad.application.port.output.CampaignRepository
+import br.com.bird.servicebirdad.application.port.output.CompanyRepositoryPort
+import br.com.bird.servicebirdad.domain.Campaign
+import br.com.bird.servicebirdad.domain.exceptions.BusinessException
+import br.com.bird.servicebirdad.infrastructure.adapter.entity.CampaignEntity
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import java.util.Objects
 
 @Component
-class CampaignService : CampaignUseCase {
-    override fun createCampaign(companyId: FixedSecureRandom.BigInteger) {
-        TODO("Not yet implemented")
+class CampaignService(
+    @Autowired private val companyRepository: CompanyRepositoryPort,
+    @Autowired private val campaignRepository: CampaignRepository
+) : CampaignUseCase {
+    override fun createCampaign(companyId: Long, campaign: Campaign): CampaignEntity {
+
+        val company = companyRepository.findById(companyId)
+        if (Objects.isNull(company)) {
+            throw BusinessException("Empresa não encontrada")
+        }
+
+
+        return campaignRepository.save(
+            CampaignEntity(
+                id = null,
+                adName = campaign.adName,
+                objective = campaign.objective,
+                budgetType = campaign.budgetType,
+                budgetValue = campaign.budgetValue,
+                startDate = campaign.startDate,
+                endDate = campaign.endDate,
+                firm = company
+            )
+        )
+
     }
 }

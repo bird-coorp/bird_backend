@@ -5,7 +5,7 @@ import br.com.bird.servicebirdad.infrastructure.adapter.entity.CompanyEntity
 
 interface CompanyRepositoryPort {
     fun save(company: CompanyEntity): CompanyEntity
-    fun findById(id: Long): Company?
+    fun findById(id: Long): CompanyEntity
     fun findAll(): List<Company>
     fun existsByCnpjOrEmail(cnpj: String, email: String): Boolean
 }
