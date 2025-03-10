@@ -1,15 +1,9 @@
 package br.com.bird.servicebirdad.infrastructure.adapter.entity
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.Table
+import com.fasterxml.jackson.annotation.JsonBackReference
+import jakarta.persistence.*
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "campaigns")
@@ -36,7 +30,31 @@ data class CampaignEntity(
     @Column(name = "end_date", nullable = false)
     val endDate: LocalDate,
 
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    val status: Status = Status.PENDING,
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)
-    val firm: CompanyEntity,
+    @JsonBackReference
+    val company: CompanyEntity,
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "campaign_totem",
+        joinColumns = [JoinColumn(name = "campaign_id")],
+        inverseJoinColumns = [JoinColumn(name = "totem_id")]
+    )
+    val totens: MutableList<TotemEntity> = mutableListOf()
 )
+
+enum class Status {
+    ACTIVE,
+    INACTIVE,
+    PENDING,
+    BLOCKING,
+    DRAFT
+}

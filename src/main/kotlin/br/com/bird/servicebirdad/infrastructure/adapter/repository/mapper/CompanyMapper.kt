@@ -11,14 +11,6 @@ object CompanyMapper {
         cnpj = entity.cnpj,
         email = "",
         phone = "",
-    )
-
-    fun toEntity(domain: Company) = CompanyEntity(
-        id = domain.id,
-        companyName = domain.companyName,
-        fantasyName = domain.fantasyName,
-        cnpj = domain.cnpj,
-        email = domain.email,
-        phone = domain.phone,
+        password = ""
     )
 }

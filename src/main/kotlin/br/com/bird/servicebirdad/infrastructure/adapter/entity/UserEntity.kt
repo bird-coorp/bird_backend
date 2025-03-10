@@ -1,17 +1,10 @@
 package br.com.bird.servicebirdad.infrastructure.adapter.entity
 
-import jakarta.persistence.CascadeType
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.JoinTable
-import jakarta.persistence.ManyToMany
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.Table
+import com.fasterxml.jackson.annotation.JsonIgnore
+import jakarta.persistence.*
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
 
 @Entity
 @Table(name = "users")
@@ -27,10 +20,11 @@ data class UserEntity(
     val email: String,
 
     @Column(name = "password", nullable = false)
-    val password: String,
+    val credentials: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)
+    @JsonIgnore
     val company: CompanyEntity,
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = [CascadeType.MERGE])
@@ -40,4 +34,21 @@ data class UserEntity(
         inverseJoinColumns = [JoinColumn(name = "profile_id")]
     )
     val profiles: List<ProfileEntity> = emptyList()
-)
+) : UserDetails {
+
+    override fun getAuthorities(): Collection<GrantedAuthority> {
+        return profiles.map { SimpleGrantedAuthority(it.name) }
+    }
+
+    override fun getPassword(): String = credentials
+
+    override fun getUsername(): String = email
+
+    override fun isAccountNonExpired(): Boolean = true
+
+    override fun isAccountNonLocked(): Boolean = true
+
+    override fun isCredentialsNonExpired(): Boolean = true
+
+    override fun isEnabled(): Boolean = true
+}

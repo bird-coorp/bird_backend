@@ -7,21 +7,27 @@ import br.com.bird.servicebirdad.domain.Campaign
 import br.com.bird.servicebirdad.domain.exceptions.BusinessException
 import br.com.bird.servicebirdad.infrastructure.adapter.entity.CampaignEntity
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
-import java.util.Objects
+import java.util.Objects.isNull
 
 @Component
 class CampaignService(
     @Autowired private val companyRepository: CompanyRepositoryPort,
     @Autowired private val campaignRepository: CampaignRepository
 ) : CampaignUseCase {
-    override fun createCampaign(companyId: Long, campaign: Campaign): CampaignEntity {
 
+    override fun getPaged(companyId: Long, pageable: Pageable): Page<CampaignEntity> {
+        return campaignRepository.findAll(companyId, pageable)
+    }
+
+    override fun createCampaign(companyId: Long, campaign: Campaign): CampaignEntity {
         val company = companyRepository.findById(companyId)
-        if (Objects.isNull(company)) {
+
+        if (isNull(company)) {
             throw BusinessException("Empresa não encontrada")
         }
-
 
         return campaignRepository.save(
             CampaignEntity(
@@ -32,7 +38,7 @@ class CampaignService(
                 budgetValue = campaign.budgetValue,
                 startDate = campaign.startDate,
                 endDate = campaign.endDate,
-                firm = company
+                company = company
             )
         )
 

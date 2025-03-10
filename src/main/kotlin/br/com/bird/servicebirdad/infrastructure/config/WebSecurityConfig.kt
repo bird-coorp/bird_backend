@@ -1,17 +1,22 @@
 package br.com.bird.servicebirdad.infrastructure.config
 
-import org.springframework.context.annotation.Bean
+import br.com.bird.servicebirdad.infrastructure.adapter.controller.interceptor.ProfileInterceptor
 import org.springframework.context.annotation.Configuration
-import org.springframework.web.cors.CorsConfiguration
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource
-import org.springframework.web.filter.CorsFilter
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.EnableWebMvc
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @EnableWebMvc
 @Configuration
-class CorsConfig : WebMvcConfigurer {
+class WebSecurityConfig(
+    private val profileInterceptor: ProfileInterceptor
+) : WebMvcConfigurer {
+
+    override fun addInterceptors(registry: InterceptorRegistry) {
+        super.addInterceptors(registry)
+        registry.addInterceptor(profileInterceptor)
+    }
 
     override fun addCorsMappings(registry: CorsRegistry) {
         super.addCorsMappings(registry)
@@ -21,6 +26,7 @@ class CorsConfig : WebMvcConfigurer {
             .allowedOrigins("*")
             .exposedHeaders(
                 "Authorization",
+                "companyId",
                 "application",
                 "Access-Control-Allow-Methods",
                 "Access-Control-Allow-Headers",

@@ -2,15 +2,12 @@ package br.com.bird.servicebirdad.infrastructure.adapter.controller
 
 import br.com.bird.servicebirdad.application.port.input.CampaignUseCase
 import br.com.bird.servicebirdad.domain.Campaign
-import br.com.bird.servicebirdad.infrastructure.adapter.controller.dto.BudgetDto
 import br.com.bird.servicebirdad.infrastructure.adapter.controller.dto.CampaignDto
-import org.bouncycastle.util.test.FixedSecureRandom.BigInteger
+import br.com.bird.servicebirdad.infrastructure.adapter.controller.dto.CampaignResponseDto
+import br.com.bird.servicebirdad.infrastructure.adapter.controller.dto.CampaignResultDto
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.net.URI
 import java.time.ZoneId
 
@@ -19,11 +16,32 @@ import java.time.ZoneId
 class CampaignController(
     private val campaignUseCase: CampaignUseCase,
 ) {
+    @GetMapping
+    fun getByCompanyId(
+        @RequestHeader("companyId") companyId: Long,
+        @RequestParam("page", defaultValue = "0") page: Int,
+        @RequestParam("size", defaultValue = "10") size: Int
+    ): ResponseEntity<CampaignResponseDto> {
+        val pageable = PageRequest.of(page, size)
+        val response = campaignUseCase.getPaged(companyId, pageable)
+            .map { CampaignResultDto.fromEntity(it, companyId) }
+        val campaignResponse =
+            CampaignResponseDto(
+                content = response.content,
+                page = pageable.pageNumber,
+                size = pageable.pageSize
+            )
 
-    @PostMapping("/{companyId}")
-    fun create(@PathVariable companyId: Long, @RequestBody campaignDto: CampaignDto): ResponseEntity<Void> {
+        return ResponseEntity.ok(campaignResponse)
+    }
+
+    @PostMapping
+    fun create(
+        @RequestHeader("companyId") companyId: Long,
+        @RequestBody campaignDto: CampaignDto
+    ): ResponseEntity<Void> {
         println("Creating campaign for company $companyId - $campaignDto")
-        val result = campaignUseCase.createCampaign(
+        campaignUseCase.createCampaign(
             companyId, Campaign(
                 id = null,
                 adName = campaignDto.budget.name,
@@ -36,6 +54,6 @@ class CampaignController(
             )
         )
 
-        return ResponseEntity.created(URI.create("/campaigns/${result.id}")).build()
+        return ResponseEntity.created(URI.create("/campaigns")).build()
     }
 }

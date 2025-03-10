@@ -1,5 +1,6 @@
 package br.com.bird.servicebirdad.infrastructure.adapter.entity
 
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -33,8 +34,10 @@ data class CompanyEntity(
     val phone: String,
 
     @OneToMany(mappedBy = "company", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonManagedReference
     val users: MutableList<UserEntity> = mutableListOf(),
 
-    @OneToMany(mappedBy = "firm", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "company", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonManagedReference
     val campaigns: MutableList<CampaignEntity> = mutableListOf(),
 )

@@ -9,6 +9,7 @@ import br.com.bird.servicebirdad.infrastructure.adapter.entity.CompanyEntity
 import br.com.bird.servicebirdad.infrastructure.adapter.entity.ProfileEntity
 import br.com.bird.servicebirdad.infrastructure.adapter.entity.UserEntity
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 
 @Service
@@ -36,11 +37,13 @@ class CompanyService(
         val adminProfile = getProfiles.find { it.id == Profiles.ADMIN }
             ?: throw BusinessException("Perfil não encontrado")
 
+        val password = BCryptPasswordEncoder().encode(company.password)
+
         val user = UserEntity(
             id = null,
             name = company.companyName,
             email = company.email,
-            password = company.fantasyName,
+            credentials = password,
             company = savedCompany,
             profiles = mutableListOf(adminProfile)
         )
@@ -56,6 +59,7 @@ class CompanyService(
             cnpj = savedCompany.cnpj,
             email = savedCompany.email,
             phone = savedCompany.phone,
+            password = "encrypted"
         )
     }
 }
