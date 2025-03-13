@@ -5,9 +5,9 @@ import br.com.bird.servicebirdad.application.port.output.CompanyRepositoryPort
 import br.com.bird.servicebirdad.domain.Company
 import br.com.bird.servicebirdad.domain.Profiles
 import br.com.bird.servicebirdad.domain.exceptions.BusinessException
-import br.com.bird.servicebirdad.infrastructure.adapter.entity.CompanyEntity
-import br.com.bird.servicebirdad.infrastructure.adapter.entity.ProfileEntity
-import br.com.bird.servicebirdad.infrastructure.adapter.entity.UserEntity
+import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.CompanyEntity
+import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.ProfileEntity
+import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.UserEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service

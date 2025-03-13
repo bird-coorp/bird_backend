@@ -1,4 +1,4 @@
-package br.com.bird.servicebirdad.infrastructure.adapter.entity
+package br.com.bird.servicebirdad.infrastructure.adapter.database.entity
 
 import jakarta.persistence.*
 
@@ -17,6 +17,6 @@ class TotemEntity(
 
     val enabled: Boolean = true,
 
-    @ManyToMany(mappedBy = "totens", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "totems", fetch = FetchType.LAZY)
     val campaigns: MutableList<CampaignEntity> = mutableListOf()
 )

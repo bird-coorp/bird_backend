@@ -1,6 +1,6 @@
 package br.com.bird.servicebirdad.infrastructure.adapter.controller.dto
 
-import br.com.bird.servicebirdad.infrastructure.adapter.entity.CampaignEntity
+import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.CampaignEntity
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.Instant
 import java.time.format.DateTimeFormatter
@@ -16,8 +16,9 @@ data class BudgetDto(
 )
 
 data class LocalizationDto(
-    val lat: Double,
-    val lng: Double,
+    val id: Long,
+    val latitude: Double,
+    val longitude: Double,
     val name: String
 )
 

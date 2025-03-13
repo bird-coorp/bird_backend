@@ -1,7 +1,7 @@
 package br.com.bird.servicebirdad.infrastructure.config
 
-import br.com.bird.servicebirdad.infrastructure.adapter.entity.ProfileEntity
-import br.com.bird.servicebirdad.infrastructure.adapter.repository.jpa.ProfileJpaRepository
+import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.ProfileEntity
+import br.com.bird.servicebirdad.infrastructure.adapter.database.repository.jpa.ProfileJpaRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 

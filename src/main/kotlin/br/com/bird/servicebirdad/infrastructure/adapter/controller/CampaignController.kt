@@ -2,12 +2,13 @@ package br.com.bird.servicebirdad.infrastructure.adapter.controller
 
 import br.com.bird.servicebirdad.application.port.input.CampaignUseCase
 import br.com.bird.servicebirdad.domain.Campaign
-import br.com.bird.servicebirdad.infrastructure.adapter.controller.dto.CampaignDto
-import br.com.bird.servicebirdad.infrastructure.adapter.controller.dto.CampaignResponseDto
-import br.com.bird.servicebirdad.infrastructure.adapter.controller.dto.CampaignResultDto
+import br.com.bird.servicebirdad.domain.RequiresProfile
+import br.com.bird.servicebirdad.infrastructure.adapter.controller.dto.*
 import org.springframework.data.domain.PageRequest
+import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import java.net.URI
 import java.time.ZoneId
 
@@ -17,7 +18,7 @@ class CampaignController(
     private val campaignUseCase: CampaignUseCase,
 ) {
     @GetMapping
-    fun getByCompanyId(
+    fun getPaged(
         @RequestHeader("companyId") companyId: Long,
         @RequestParam("page", defaultValue = "0") page: Int,
         @RequestParam("size", defaultValue = "10") size: Int
@@ -35,14 +36,28 @@ class CampaignController(
         return ResponseEntity.ok(campaignResponse)
     }
 
-    @PostMapping
-    fun create(
+
+    @GetMapping("/{id}")
+    fun getById(
+        @RequestHeader("Authorization") token: String,
         @RequestHeader("companyId") companyId: Long,
-        @RequestBody campaignDto: CampaignDto
+        @PathVariable id: Long,
+    ): ResponseEntity<CampaignDetailDTO> {
+        return ResponseEntity.ok(
+            campaignUseCase.getById(token, companyId, id)
+        )
+    }
+
+    @PostMapping(consumes = [MULTIPART_FORM_DATA_VALUE])
+    fun create(
+        @RequestPart("file") file: MultipartFile,
+        @RequestHeader("companyId") companyId: Long,
+        @RequestPart("campaignDto") campaignDto: CampaignDto,
     ): ResponseEntity<Void> {
-        println("Creating campaign for company $companyId - $campaignDto")
         campaignUseCase.createCampaign(
-            companyId, Campaign(
+            media = file,
+            companyId = companyId,
+            campaign = Campaign(
                 id = null,
                 adName = campaignDto.budget.name,
                 objective = campaignDto.objective,
@@ -50,10 +65,27 @@ class CampaignController(
                 budgetValue = campaignDto.budget.amount,
                 startDate = campaignDto.budget.scheduleStart.atZone(ZoneId.systemDefault()).toLocalDate(),
                 endDate = campaignDto.budget.scheduleEnd.atZone(ZoneId.systemDefault()).toLocalDate(),
-                companyId = companyId
-            )
+                companyId = companyId,
+                totems = campaignDto.localization.map { it.id }
+            ),
         )
 
         return ResponseEntity.created(URI.create("/campaigns")).build()
+    }
+
+    @RequiresProfile("ADMIN")
+    @PutMapping("/{id}")
+    fun configure(
+        @RequestHeader("Authorization") token: String,
+        @RequestHeader("companyId") companyId: Long,
+        @PathVariable id: Long,
+        @RequestBody campaignConfigurationDTO: CampaignConfigurationDTO
+    ): ResponseEntity<Void> {
+        campaignUseCase.configure(
+            company = companyId,
+            campaign = id,
+            data = campaignConfigurationDTO
+        )
+        return ResponseEntity.noContent().build<Void>()
     }
 }

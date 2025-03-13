@@ -1,4 +1,14 @@
 spring:
+  cache:
+    type: caffeine
+    cache-names: files
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=86400s
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+
   datasource:
     url: jdbc:postgresql://localhost:5432/my_database
     username: user

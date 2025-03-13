@@ -1,12 +1,17 @@
-package br.com.bird.servicebirdad.infrastructure.adapter.entity
+package br.com.bird.servicebirdad.infrastructure.adapter.database.entity
 
-import com.fasterxml.jackson.annotation.JsonBackReference
+import com.fasterxml.jackson.annotation.JsonIdentityInfo
+import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import jakarta.persistence.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Entity
 @Table(name = "campaigns")
+@JsonIdentityInfo(
+    generator = ObjectIdGenerators.PropertyGenerator::class,
+    property = "id"
+)
 data class CampaignEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +41,6 @@ data class CampaignEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)
-    @JsonBackReference
     val company: CompanyEntity,
 
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -48,13 +52,23 @@ data class CampaignEntity(
         joinColumns = [JoinColumn(name = "campaign_id")],
         inverseJoinColumns = [JoinColumn(name = "totem_id")]
     )
-    val totens: MutableList<TotemEntity> = mutableListOf()
-)
+    val totems: MutableList<TotemEntity> = mutableListOf(),
+
+    val fileId: Long? = null,
+) {
+    override fun toString(): String {
+        return "CampaignEntity(id=$id, adName='$adName', objective='$objective', budgetType='$budgetType', budgetValue=$budgetValue, startDate=$startDate, endDate=$endDate, status=$status, createdAt=$createdAt, fileId=$fileId)"
+    }
+}
 
 enum class Status {
-    ACTIVE,
-    INACTIVE,
-    PENDING,
-    BLOCKING,
-    DRAFT
+    APPROVED, // QUANDO A CAMPANHA É APROVADA
+
+    ACTIVE, // QUANDO A CAMPANHA ESTÁ EM VEICULAÇÃO -> REQUER ESTAR APROVADA -> SISTEMA DEVE ATIVAR AUTOMATICAMENTE
+
+    INACTIVE, // QUANDO O USUÁRIO DESATIVA A CAMPANHA -> REQUER ESTAR ATIVA
+
+    PENDING, // QUANDO A CAMPANHA ESTÁ AGUARDANDO APROVAÇÃO -> QUANDO CRIADA
+
+    DENIED, // QUANDO A CAMPANHA É NEGADA POR ALGUM MOTIVO -> REQUER JUSTIFICATIVA -> REQUER ESTAR PENDENTE
 }

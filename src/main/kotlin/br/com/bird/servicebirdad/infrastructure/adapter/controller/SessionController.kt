@@ -1,7 +1,7 @@
 package br.com.bird.servicebirdad.infrastructure.adapter.controller
 
 import br.com.bird.servicebirdad.application.service.TokenService
-import br.com.bird.servicebirdad.infrastructure.adapter.entity.UserEntity
+import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.UserEntity
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken

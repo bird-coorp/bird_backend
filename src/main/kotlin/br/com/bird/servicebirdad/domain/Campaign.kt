@@ -10,5 +10,6 @@ data class Campaign(
     val budgetValue: Double,
     val startDate: LocalDate,
     val endDate: LocalDate,
-    val companyId: Long
+    val companyId: Long,
+    val totems: List<Long>
 )

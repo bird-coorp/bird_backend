@@ -1,14 +1,14 @@
 package br.com.bird.servicebirdad.application.service
 
 import br.com.bird.servicebirdad.application.port.input.TotemUseCase
-import br.com.bird.servicebirdad.application.port.output.TotemRepository
+import br.com.bird.servicebirdad.application.port.output.TotemRepositoryPort
 import br.com.bird.servicebirdad.domain.Totem
-import br.com.bird.servicebirdad.infrastructure.adapter.entity.TotemEntity
+import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.TotemEntity
 import org.springframework.stereotype.Component
 
 @Component
 class TotemService(
-    private val totemRepository: TotemRepository,
+    private val totemRepository: TotemRepositoryPort,
 ) : TotemUseCase {
     override fun create(totem: Totem) = totemRepository.create(
         totem = totem.toEntity()

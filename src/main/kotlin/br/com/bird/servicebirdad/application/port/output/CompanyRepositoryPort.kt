@@ -1,7 +1,7 @@
 package br.com.bird.servicebirdad.application.port.output
 
 import br.com.bird.servicebirdad.domain.Company
-import br.com.bird.servicebirdad.infrastructure.adapter.entity.CompanyEntity
+import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.CompanyEntity
 
 interface CompanyRepositoryPort {
     fun save(company: CompanyEntity): CompanyEntity

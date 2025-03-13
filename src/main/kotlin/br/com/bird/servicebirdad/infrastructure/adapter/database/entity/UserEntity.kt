@@ -1,4 +1,4 @@
-package br.com.bird.servicebirdad.infrastructure.adapter.entity
+package br.com.bird.servicebirdad.infrastructure.adapter.database.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*

@@ -1,7 +1,7 @@
-package br.com.bird.servicebirdad.infrastructure.adapter.repository.mapper
+package br.com.bird.servicebirdad.infrastructure.adapter.database.repository.mapper
 
 import br.com.bird.servicebirdad.domain.Company
-import br.com.bird.servicebirdad.infrastructure.adapter.entity.CompanyEntity
+import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.CompanyEntity
 
 object CompanyMapper {
     fun toDomain(entity: CompanyEntity) = Company(
