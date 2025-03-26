@@ -2,7 +2,7 @@ package br.com.bird.servicebirdad.application.service
 
 import br.com.bird.servicebirdad.application.port.input.CampaignUseCase
 import br.com.bird.servicebirdad.application.port.output.CampaignFileRepository
-import br.com.bird.servicebirdad.application.port.output.CampaignRepository
+import br.com.bird.servicebirdad.application.port.output.CampaignRepositoryPort
 import br.com.bird.servicebirdad.application.port.output.CompanyRepositoryPort
 import br.com.bird.servicebirdad.application.port.output.TotemRepositoryPort
 import br.com.bird.servicebirdad.domain.Campaign
@@ -11,7 +11,7 @@ import br.com.bird.servicebirdad.infrastructure.adapter.controller.dto.CampaignC
 import br.com.bird.servicebirdad.infrastructure.adapter.controller.dto.CampaignDetailDTO
 import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.CampaignEntity
 import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.CampaignFileEntity
-import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.Status
+import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.Status.DENIED
 import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.Status.INACTIVE
 import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,7 +24,7 @@ import java.util.Objects.isNull
 @Component
 class CampaignService(
     @Autowired private val companyRepository: CompanyRepositoryPort,
-    @Autowired private val campaignRepository: CampaignRepository,
+    @Autowired private val campaignRepository: CampaignRepositoryPort,
     @Autowired private val totemRepositoryPort: TotemRepositoryPort,
     @Autowired private val campaignFileRepository: CampaignFileRepository
 ) : CampaignUseCase {
@@ -78,17 +78,26 @@ class CampaignService(
         )
     }
 
-    override fun configure(company: Long, campaign: Long, data: CampaignConfigurationDTO) {
-        val campaign = campaignRepository.findById(campaign)
+    @Transactional(rollbackOn = [Exception::class])
+    override fun configure(company: Long, campaignId: Long, data: CampaignConfigurationDTO) {
+        val campaign = campaignRepository.findById(campaignId)
 
         if (campaign.status == INACTIVE) {
-            throw BusinessException("Campaign $campaign is  inactive")
+            throw BusinessException("Campaign $campaignId is inactive")
         }
 
-        if (data.status == Status.DENIED && data.reason.isNullOrBlank()) {
+        if (campaign.status == DENIED) {
+            throw BusinessException("Campaign $campaignId is denied")
+        }
+
+        if (data.status == DENIED && data.reason.isNullOrBlank()) {
             throw BusinessException("Reason is required when status is denied")
         }
 
+//        if (data.status == Status.DENIED && 1 == 1) {
+//            // verificar se usuario é admin
+//        }
 
+        campaignRepository.updateStatus(campaignId, data.status)
     }
 }

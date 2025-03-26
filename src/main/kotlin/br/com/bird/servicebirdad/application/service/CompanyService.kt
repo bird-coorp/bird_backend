@@ -8,6 +8,7 @@ import br.com.bird.servicebirdad.domain.exceptions.BusinessException
 import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.CompanyEntity
 import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.ProfileEntity
 import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.UserEntity
+import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
@@ -17,6 +18,8 @@ class CompanyService(
     @Autowired private val companyRepository: CompanyRepositoryPort,
     private val getProfiles: MutableList<ProfileEntity>,
 ) : CompanyUseCase {
+
+    @Transactional(rollbackOn = [Exception::class])
     override fun createCompany(company: Company): Company {
         if (companyRepository.existsByCnpjOrEmail(company.cnpj, company.email)) {
             throw BusinessException("Já existe uma empresa cadastrada com este CNPJ ou E-mail.")

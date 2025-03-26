@@ -24,6 +24,7 @@ class TokenService {
             return TokenClaims(
                 role = user.authorities.map { it.authority },
                 id = user.id!!,
+                companyId = user.company.id!!,
                 name = user.name,
                 email = user.email
             )
@@ -68,6 +69,10 @@ class TokenService {
             .withExpiresAt(from(now().plusSeconds(3600)))
             .sign(algorithm)
     }
+
+    fun getTokenData(token: String): TokenClaims {
+        return mapper.readValue(getPayload(token), TokenClaims::class.java)
+    }
 }
 
 data class TokenClaims(
@@ -75,4 +80,5 @@ data class TokenClaims(
     val id: Long,
     val name: String,
     val email: String,
+    val companyId: Long,
 )

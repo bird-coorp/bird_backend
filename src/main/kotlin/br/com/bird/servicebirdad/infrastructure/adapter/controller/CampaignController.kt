@@ -2,7 +2,6 @@ package br.com.bird.servicebirdad.infrastructure.adapter.controller
 
 import br.com.bird.servicebirdad.application.port.input.CampaignUseCase
 import br.com.bird.servicebirdad.domain.Campaign
-import br.com.bird.servicebirdad.domain.RequiresProfile
 import br.com.bird.servicebirdad.infrastructure.adapter.controller.dto.*
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
@@ -73,7 +72,6 @@ class CampaignController(
         return ResponseEntity.created(URI.create("/campaigns")).build()
     }
 
-    @RequiresProfile("ADMIN")
     @PutMapping("/{id}")
     fun configure(
         @RequestHeader("Authorization") token: String,
@@ -83,7 +81,7 @@ class CampaignController(
     ): ResponseEntity<Void> {
         campaignUseCase.configure(
             company = companyId,
-            campaign = id,
+            campaignId = id,
             data = campaignConfigurationDTO
         )
         return ResponseEntity.noContent().build<Void>()

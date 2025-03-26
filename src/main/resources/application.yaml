@@ -28,3 +28,7 @@ api:
   security:
     token:
       secret: 123456
+
+campaign:
+  activation:
+    cron: 0 * * * * ?

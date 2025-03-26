@@ -37,7 +37,8 @@ data class CampaignEntity(
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    val status: Status = Status.PENDING,
+    @Convert(converter = StatusConverter::class)
+    var status: Status = Status.PENDING,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)
@@ -53,6 +54,14 @@ data class CampaignEntity(
         inverseJoinColumns = [JoinColumn(name = "totem_id")]
     )
     val totems: MutableList<TotemEntity> = mutableListOf(),
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "campaign_historic",
+        joinColumns = [JoinColumn(name = "campaign_id")],
+        inverseJoinColumns = [JoinColumn(name = "historic_id")]
+    )
+    val historic: MutableList<HistoricEntity> = mutableListOf(),
 
     val fileId: Long? = null,
 ) {
@@ -71,4 +80,15 @@ enum class Status {
     PENDING, // QUANDO A CAMPANHA ESTÁ AGUARDANDO APROVAÇÃO -> QUANDO CRIADA
 
     DENIED, // QUANDO A CAMPANHA É NEGADA POR ALGUM MOTIVO -> REQUER JUSTIFICATIVA -> REQUER ESTAR PENDENTE
+}
+
+@Converter(autoApply = true)
+class StatusConverter : AttributeConverter<Status, String> {
+    override fun convertToDatabaseColumn(attribute: Status?): String {
+        return attribute?.name?.lowercase() ?: "pending"
+    }
+
+    override fun convertToEntityAttribute(dbData: String?): Status {
+        return Status.values().find { it.name.lowercase() == dbData } ?: Status.PENDING
+    }
 }

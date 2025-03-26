@@ -56,6 +56,12 @@ class SecurityConfigurations(
                     .requestMatchers(POST, "/sessions").permitAll()
 
                     .requestMatchers(GET, "/totem").permitAll()
+                    .requestMatchers(GET, "/schedule/*").permitAll()
+                    .requestMatchers(GET, "/media/*").permitAll()
+
+                    .requestMatchers(GET, "/sse/connect/*").permitAll()
+                    .requestMatchers(GET, "/sse").permitAll()
+//                    .requestMatchers(POST, "/sse/send/*").permitAll()
 
                     // Sign-up methods
                     .requestMatchers(POST, "/companies").permitAll()
