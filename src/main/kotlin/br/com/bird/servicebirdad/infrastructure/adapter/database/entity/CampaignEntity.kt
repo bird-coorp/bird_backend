@@ -3,6 +3,7 @@ package br.com.bird.servicebirdad.infrastructure.adapter.database.entity
 import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import jakarta.persistence.*
+import jakarta.persistence.GenerationType.IDENTITY
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -14,7 +15,7 @@ import java.time.LocalDateTime
 )
 data class CampaignEntity(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     val id: Long? = null,
 
     @Column(name = "ad_name", nullable = false)
@@ -62,6 +63,14 @@ data class CampaignEntity(
         inverseJoinColumns = [JoinColumn(name = "historic_id")]
     )
     val historic: MutableList<HistoricEntity> = mutableListOf(),
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "campaign_reason_historic",
+        joinColumns = [JoinColumn(name = "campaign_id")],
+        inverseJoinColumns = [JoinColumn(name = "historic_id")]
+    )
+    val campaignReasonHistoric: MutableList<CampaignReasonHistoricEntity> = mutableListOf(),
 
     val fileId: Long? = null,
 ) {

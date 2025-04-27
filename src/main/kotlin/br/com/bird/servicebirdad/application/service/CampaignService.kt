@@ -1,16 +1,12 @@
 package br.com.bird.servicebirdad.application.service
 
 import br.com.bird.servicebirdad.application.port.input.CampaignUseCase
-import br.com.bird.servicebirdad.application.port.output.CampaignFileRepository
-import br.com.bird.servicebirdad.application.port.output.CampaignRepositoryPort
-import br.com.bird.servicebirdad.application.port.output.CompanyRepositoryPort
-import br.com.bird.servicebirdad.application.port.output.TotemRepositoryPort
+import br.com.bird.servicebirdad.application.port.output.*
 import br.com.bird.servicebirdad.domain.Campaign
 import br.com.bird.servicebirdad.domain.exceptions.BusinessException
 import br.com.bird.servicebirdad.infrastructure.adapter.controller.dto.CampaignConfigurationDTO
 import br.com.bird.servicebirdad.infrastructure.adapter.controller.dto.CampaignDetailDTO
-import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.CampaignEntity
-import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.CampaignFileEntity
+import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.*
 import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.Status.DENIED
 import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.Status.INACTIVE
 import jakarta.transaction.Transactional
@@ -19,14 +15,19 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
+import java.time.LocalDateTime
 import java.util.Objects.isNull
 
 @Component
 class CampaignService(
+    @Autowired private val minioService: MinioService,
     @Autowired private val companyRepository: CompanyRepositoryPort,
     @Autowired private val campaignRepository: CampaignRepositoryPort,
     @Autowired private val totemRepositoryPort: TotemRepositoryPort,
-    @Autowired private val campaignFileRepository: CampaignFileRepository
+    @Autowired private val campaignFileRepository: CampaignFilePort,
+    @Autowired private val historicRepositoryPort: HistoricRepositoryPort,
+    @Autowired private val campaignReasonHistoricPort: CampaignReasonHistoricPort,
+    @Autowired private val tokenService: TokenService,
 ) : CampaignUseCase {
 
     override fun getById(token: String, companyId: Long, id: Long): CampaignDetailDTO {
@@ -53,12 +54,13 @@ class CampaignService(
 
         val totems = campaign.totems.map { totemRepositoryPort.findById(it) }.toMutableList()
 
+        val fileName = minioService.upload(file = media)
+
         val fileId = campaignFileRepository.save(
             CampaignFileEntity(
                 id = null,
-                content = media.bytes,
                 mimeType = media.contentType ?: "video/mp4",
-                filename = media.name,
+                filename = fileName
             )
         )
 
@@ -79,8 +81,15 @@ class CampaignService(
     }
 
     @Transactional(rollbackOn = [Exception::class])
-    override fun configure(company: Long, campaignId: Long, data: CampaignConfigurationDTO) {
+    override fun configure(
+        company: Long,
+        campaignId: Long,
+        data: CampaignConfigurationDTO,
+        token: String
+    ) {
         val campaign = campaignRepository.findById(campaignId)
+        val isAdmin = tokenService.havingClaim(token, "ADMIN")
+        var reason: CampaignReasonHistoricEntity? = null
 
         if (campaign.status == INACTIVE) {
             throw BusinessException("Campaign $campaignId is inactive")
@@ -92,12 +101,33 @@ class CampaignService(
 
         if (data.status == DENIED && data.reason.isNullOrBlank()) {
             throw BusinessException("Reason is required when status is denied")
+        } else {
+            reason = campaignReasonHistoricPort.save(
+                CampaignReasonHistoricEntity(
+                    null,
+                    reason = data.status.name
+                )
+            )
         }
 
-//        if (data.status == Status.DENIED && 1 == 1) {
-//            // verificar se usuario é admin
-//        }
+        if (data.status == DENIED && !isAdmin) {
+            throw BusinessException("You do not have permission to perform this action")
+        }
 
-        campaignRepository.updateStatus(campaignId, data.status)
+        val historic = historicRepositoryPort.save(
+            HistoricEntity(
+                id = null,
+                since = campaign.status,
+                until = data.status,
+                createdAt = LocalDateTime.now(),
+                origin = Origin.WEB
+            )
+        )
+
+        campaign.historic.add(historic)
+        campaign.status = data.status
+        campaign.campaignReasonHistoric.add(reason)
+
+        campaignRepository.save(campaign)
     }
 }

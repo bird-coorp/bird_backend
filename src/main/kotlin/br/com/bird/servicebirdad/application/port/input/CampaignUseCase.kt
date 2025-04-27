@@ -12,5 +12,5 @@ interface CampaignUseCase {
     fun getById(token: String, companyId: Long, id: Long): CampaignDetailDTO
     fun getPaged(companyId: Long, pageable: Pageable): Page<CampaignEntity>
     fun createCampaign(companyId: Long, campaign: Campaign, media: MultipartFile): CampaignEntity
-    fun configure(company: Long, campaignId: Long, data: CampaignConfigurationDTO)
+    fun configure(company: Long, campaignId: Long, data: CampaignConfigurationDTO, token: String)
 }

@@ -33,7 +33,7 @@ data class UserEntity(
         joinColumns = [JoinColumn(name = "user_id")],
         inverseJoinColumns = [JoinColumn(name = "profile_id")]
     )
-    val profiles: List<ProfileEntity> = emptyList()
+    val profiles: List<ProfileEntity> = emptyList(),
 ) : UserDetails {
 
     override fun getAuthorities(): Collection<GrantedAuthority> {

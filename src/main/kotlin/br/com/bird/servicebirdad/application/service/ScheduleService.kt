@@ -65,7 +65,7 @@ class ScheduleService(
         while (!current.isAfter(endDateTime)) {
             println("Add slot ${current.toLocalTime()}")
             slots.add(current.toLocalTime())
-            current = current.plusSeconds(30)
+            current = current.plusSeconds(15)
         }
 
         return slots

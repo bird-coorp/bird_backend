@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
+import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 
 @Entity
@@ -46,6 +47,9 @@ data class CompanyEntity(
     @OneToMany(mappedBy = "company", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonManagedReference
     val campaigns: MutableList<CampaignEntity> = mutableListOf(),
+
+    @OneToOne(mappedBy = "company", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val bankBalance: BankBalanceEntity? = null
 ) {
     override fun toString(): String {
         return "CompanyEntity(id=$id, companyName='$companyName', fantasyName='$fantasyName', cnpj='$cnpj', email='$email', phone='$phone', users=$users)"

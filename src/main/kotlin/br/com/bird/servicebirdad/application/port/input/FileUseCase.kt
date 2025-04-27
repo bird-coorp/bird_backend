@@ -1,7 +1,7 @@
 package br.com.bird.servicebirdad.application.port.input
 
-import br.com.bird.servicebirdad.infrastructure.adapter.database.entity.CampaignFileEntity
+import org.springframework.core.io.InputStreamResource
 
 interface FileUseCase {
-    fun getById(id: Long): CampaignFileEntity
+    fun getById(id: Long): Pair<InputStreamResource, String>
 }

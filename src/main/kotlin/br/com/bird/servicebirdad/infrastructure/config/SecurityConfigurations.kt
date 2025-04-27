@@ -66,6 +66,8 @@ class SecurityConfigurations(
                     // Sign-up methods
                     .requestMatchers(POST, "/companies").permitAll()
 
+                    .requestMatchers(POST, "/webhook").permitAll()
+
                     .anyRequest().authenticated()
             }
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter::class.java)

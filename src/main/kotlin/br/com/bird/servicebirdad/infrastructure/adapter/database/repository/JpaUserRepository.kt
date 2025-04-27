@@ -15,4 +15,7 @@ class JpaUserRepository(
     override fun findByLogin(login: String): UserDetails {
         return userJpaRepository.findByEmail(login)
     }
+
+    override fun findById(id: Long) =
+        userJpaRepository.findById(id)
 }

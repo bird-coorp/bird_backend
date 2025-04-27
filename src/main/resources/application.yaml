@@ -32,3 +32,13 @@ api:
 campaign:
   activation:
     cron: 0 * * * * ?
+
+stripe:
+  secret:
+    key: sk_test_51RDa0RR6oECWnCB1Xf7vsp3Sq8rc5FuYfk3JTFnpawk5gy5quQ7WGonOBcMKSbb741aYxDzbGqM19NBSGo0Wwlx700nMqT4VFm
+
+minio:
+  url: http://127.0.0.1:9000
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket-name: bird-bucket

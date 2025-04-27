@@ -82,7 +82,8 @@ class CampaignController(
         campaignUseCase.configure(
             company = companyId,
             campaignId = id,
-            data = campaignConfigurationDTO
+            data = campaignConfigurationDTO,
+            token = token
         )
         return ResponseEntity.noContent().build<Void>()
     }

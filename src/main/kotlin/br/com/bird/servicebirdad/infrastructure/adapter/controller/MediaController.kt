@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpHeaders.CONTENT_DISPOSITION
 import org.springframework.http.HttpHeaders.CONTENT_TYPE
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 
 @RestController
@@ -17,14 +18,13 @@ class MediaController(
     private val fileUseCase: FileUseCase
 ) {
     @GetMapping("/{fileId}")
-    fun getMedia(@PathVariable fileId: Long): ResponseEntity<ByteArray> {
-        val response = fileUseCase.getById(fileId)
+    fun getMedia(@PathVariable fileId: Long): ResponseEntity<Any> {
+        val (resource, filename) = fileUseCase.getById(fileId)
 
-        val headers = HttpHeaders().apply {
-            add(CONTENT_TYPE, response.mimeType)
-            add(CONTENT_DISPOSITION, "inline; filename=\"${response.filename}\"")
-        }
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"$filename\"")
+            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+            .body(resource)
 
-        return ResponseEntity(response.content, headers, HttpStatus.OK)
     }
 }

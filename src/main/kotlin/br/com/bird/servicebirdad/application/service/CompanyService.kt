@@ -19,6 +19,8 @@ class CompanyService(
     private val getProfiles: MutableList<ProfileEntity>,
 ) : CompanyUseCase {
 
+    override fun getByCompanyId(companyId: Long) = companyRepository.findById(companyId)
+
     @Transactional(rollbackOn = [Exception::class])
     override fun createCompany(company: Company): Company {
         if (companyRepository.existsByCnpjOrEmail(company.cnpj, company.email)) {

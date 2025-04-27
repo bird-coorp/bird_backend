@@ -5,6 +5,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTVerificationException
 import com.auth0.jwt.exceptions.TokenExpiredException
+import com.auth0.jwt.interfaces.Claim
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -72,6 +73,11 @@ class TokenService {
 
     fun getTokenData(token: String): TokenClaims {
         return mapper.readValue(getPayload(token), TokenClaims::class.java)
+    }
+
+    fun havingClaim(token: String, claim: String): Boolean {
+        val tokenData = getTokenData(token)
+        return tokenData.role.contains(claim)
     }
 }
 
