@@ -35,7 +35,7 @@ campaign:
 
 stripe:
   secret:
-    key: ${STRIPE_SECRET_KEY}
+    key: {STRIPE_SECRET_KEY}
 
 minio:
   url: http://127.0.0.1:9000

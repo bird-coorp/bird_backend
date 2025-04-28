@@ -18,13 +18,12 @@ class MediaController(
     private val fileUseCase: FileUseCase
 ) {
     @GetMapping("/{fileId}")
-    fun getMedia(@PathVariable fileId: Long): ResponseEntity<Any> {
-        val (resource, filename) = fileUseCase.getById(fileId)
-
-        return ResponseEntity.ok()
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"$filename\"")
-            .contentType(MediaType.APPLICATION_OCTET_STREAM)
-            .body(resource)
-
+    fun getMedia(@PathVariable fileId: Long): ResponseEntity<FileResource> {
+        val fileUrl = fileUseCase.getFileUrl(fileId)
+        return ResponseEntity.ok(FileResource(fileUrl))
     }
 }
+
+data class FileResource(
+    val url: String,
+)

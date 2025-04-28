@@ -12,11 +12,11 @@ import java.util.concurrent.TimeUnit
 class CacheConfig {
     @Bean
     fun cacheManager(): CaffeineCacheManager {
-        val cacheManager = CaffeineCacheManager("files")
+        val cacheManager = CaffeineCacheManager("fileUrl")
         cacheManager.setCaffeine(
             Caffeine.newBuilder()
                 .maximumSize(10000)
-                .expireAfterWrite(24, TimeUnit.HOURS) // Expiração de 24 horas
+                .expireAfterWrite(24, TimeUnit.HOURS)
         )
         return cacheManager
     }

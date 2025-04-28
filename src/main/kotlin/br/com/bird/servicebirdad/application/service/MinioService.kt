@@ -1,8 +1,10 @@
 package br.com.bird.servicebirdad.application.service
 
 import io.minio.GetObjectArgs
+import io.minio.GetPresignedObjectUrlArgs
 import io.minio.MinioClient
 import io.minio.PutObjectArgs
+import io.minio.http.Method
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.InputStreamResource
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.io.InputStream
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 @Service
 class MinioService(
@@ -47,5 +50,17 @@ class MinioService(
         )
 
         return InputStreamResource(stream)
+    }
+
+    fun getFileUrl(fileName: String): String {
+        val expiry = TimeUnit.HOURS.toSeconds(24)
+        return minioClient.getPresignedObjectUrl(
+            GetPresignedObjectUrlArgs.builder()
+                .method(Method.GET)
+                .bucket(bucketName)
+                .`object`(fileName)
+                .expiry(expiry.toInt())
+                .build()
+        )
     }
 }
