@@ -41,7 +41,7 @@ stripe:
     key: ${STRIPE_SECRET_KEY}
 
 minio:
-  url: http://${MINIO_PRIVATE_HOST}:${MINIO_PRIVATE_PORT}
+  url: ${CONSOLE_MINIO_SERVER}
   access-key: ${MINIO_ROOT_USER}
   secret-key: ${MINIO_ROOT_PASSWORD}
   bucket-name: bird-bucket
