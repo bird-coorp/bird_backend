@@ -12,8 +12,9 @@ class FileService(
     private val campaignFileRepository: CampaignFilePort
 ) : FileUseCase {
     @Cacheable("fileUrl")
-    override fun getFileUrl(fileId: Long): String {
+    override fun getFileUrl(fileId: Long): Pair<String, Long> {
         val file = campaignFileRepository.findById(fileId)
-        return minioService.getFileUrl(file.filename)
+        val fileUrl = minioService.getFileUrl(file.filename)
+        return Pair(fileUrl, fileId)
     }
 }

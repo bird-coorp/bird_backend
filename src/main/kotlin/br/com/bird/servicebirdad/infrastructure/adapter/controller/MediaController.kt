@@ -19,11 +19,12 @@ class MediaController(
 ) {
     @GetMapping("/{fileId}")
     fun getMedia(@PathVariable fileId: Long): ResponseEntity<FileResource> {
-        val fileUrl = fileUseCase.getFileUrl(fileId)
-        return ResponseEntity.ok(FileResource(fileUrl))
+        val (fileUrl, fileId) = fileUseCase.getFileUrl(fileId)
+        return ResponseEntity.ok(FileResource(fileUrl, fileId))
     }
 }
 
 data class FileResource(
     val url: String,
+    val fileId: Long,
 )
